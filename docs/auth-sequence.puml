@@ -1,0 +1,88 @@
+@startuml
+actor Client
+participant "Spring Gateway" as Gateway
+participant "Auth Service\n(Keycloak)" as Auth
+participant "app_splitwise" as App
+database Database
+
+== Authentication ==
+Client -> Gateway : POST /api/login
+Gateway -> Auth : authenticate()
+Auth --> Gateway : JWT (access + refresh)
+Gateway --> Client : JWT
+
+Client -> Gateway : POST /api/refresh
+Gateway -> Auth : refreshToken()
+Auth --> Gateway : new JWT
+Gateway --> Client : JWT
+
+Client -> Gateway : POST /api/logout
+Gateway -> Auth : logout()
+Gateway --> Client : 200 OK
+
+== Groups ==
+Client -> Gateway : GET /api/v1/groups
+Gateway -> App : forward request
+App -> Database : fetch user groups
+Database --> App : groups
+App --> Gateway : groups
+Gateway --> Client : groups list
+
+Client -> Gateway : POST /api/v1/group
+Gateway -> App : create group
+App -> Database : insert group + members
+Database --> App : groupId
+App --> Gateway : success
+Gateway --> Client : group created
+
+Client -> Gateway : PUT /api/v1/add-remove/{groupId}/{userId}
+Gateway -> App : add/remove member
+App -> Database : update group_users
+Database --> App : OK
+App --> Gateway
+Gateway --> Client
+
+== Friends ==
+Client -> Gateway : GET /api/v1/friends
+Gateway -> App
+App -> Database : fetch friends + transactions
+Database --> App
+App --> Gateway
+Gateway --> Client
+
+Client -> Gateway : POST /api/v1/friend
+Gateway -> App : add friend
+App -> Database : insert friends
+Database --> App
+App --> Gateway
+Gateway --> Client
+
+== Transactions ==
+Client -> Gateway : POST /api/v1/transaction
+Gateway -> App : create transaction
+App -> Database : insert transaction
+Database --> App : transactionId
+App --> Gateway
+Gateway --> Client
+
+Client -> Gateway : GET /api/v1/transaction/{id}
+Gateway -> App
+App -> Database : fetch transaction
+Database --> App
+App --> Gateway
+Gateway --> Client
+
+Client -> Gateway : PUT /api/v1/transaction/{id}
+Gateway -> App
+App -> Database : update transaction
+Database --> App
+App --> Gateway
+Gateway --> Client
+
+Client -> Gateway : DELETE /api/v1/transaction/{id}
+Gateway -> App
+App -> Database : delete transaction
+Database --> App
+App --> Gateway
+Gateway --> Client
+@enduml
