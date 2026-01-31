@@ -3,18 +3,16 @@ package com.app.splitwise.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 
 @Data
 @Builder
-public class Group {
+public class UserGroup {
     @JsonProperty("groupId")
-    private Long groupId;
-
-    @JsonProperty("groupName")
-    private String groupName;
+    private UUID groupId;
 
     @JsonProperty("userId")
-    private Long userId;
+    private UUID userId;
 }
