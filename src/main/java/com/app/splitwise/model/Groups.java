@@ -11,8 +11,8 @@ import java.util.UUID;
 public class Groups {
 
     @JsonProperty("groupId")
-    UUID groupId;
+    private UUID groupId;
 
     @JsonProperty("groupName")
-    String groupName;
+    private String groupName;
 }
