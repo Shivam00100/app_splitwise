@@ -19,11 +19,16 @@ CREATE TABLE IF NOT EXISTS app_schema."transaction"(
    borrower UUID NOT NULL,
    lender UUID  NOT NULL,
    amount BIGINT DEFAULT 0 NOT NULL,
-   group_id UUID NULL
+   group_id UUID NULL,
+   FOREIGN KEY (group_id) REFERENCES app_schema."groups"(id),
+   FOREIGN KEY (borrower) REFERENCES app_schema."user"(id),
+   FOREIGN KEY (lender) REFERENCES app_schema."user"(id)
 );
 
 CREATE TABLE IF NOT EXISTS app_schema."user_group"(
     user_id UUID,
     group_id UUID,
-    PRIMARY KEY (user_id, group_id)
+    PRIMARY KEY (user_id, group_id),
+    FOREIGN KEY (user_id) REFERENCES app_schema."user"(id),
+    FOREIGN KEY (group_id) REFERENCES app_schema."groups"(id)
 );
