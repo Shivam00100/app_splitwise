@@ -1,16 +1,16 @@
+server:
+  port: 8001
+
 spring:
   application:
-    name: splitwise
+    name: lets-split
 
   datasource:
-    url: jdbc:mysql://localhost:3306/splitwiseDB
-    username: root
-    password: password
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:postgresql://localhost:5432/split_db?currentSchema=app_schema
+    username: app_user
+    password: app_user123
+    driver-class-name: org.postgresql.Driver
 
   sql:
     init:
-      mode: always
-
-server:
-  port: 8084
+      mode: always # mark it never in prod

@@ -1,0 +1,73 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Client Layer" {
+  [psql / App Clients]
+}
+
+package "Postmaster (postgres)" {
+  [Connection Manager]
+  [Process Forker]
+  [Signal Handler]
+}
+
+package "Backend Processes (per connection)" {
+  [Backend Process]
+}
+
+package "Auxiliary / Background Processes" {
+  [Checkpointer]
+  [Background Writer]
+  [WAL Writer]
+  [Autovacuum Launcher]
+  [Autovacuum Worker]
+  [Stats Collector]
+  [Logical Replication Launcher]
+  [Logical Replication Worker]
+  [Archiver]
+}
+
+package "Shared Memory" {
+  [Shared Buffers]
+  [WAL Buffers]
+  [Lock Manager]
+  [Proc Array]
+  [CLOG / pg_xact]
+  [Subtrans]
+  [Commit Timestamp]
+}
+
+package "Storage" {
+  [Data Files]
+  [WAL Files]
+  [FSM]
+  [VM]
+}
+
+[psql / App Clients] --> [Postmaster (postgres)] : startup / auth
+[Postmaster (postgres)] --> [Backend Process] : fork per connection
+
+[Backend Process] --> [Shared Buffers] : read/write pages
+[Backend Process] --> [WAL Buffers] : generate WAL
+[Backend Process] --> [Lock Manager] : acquire locks
+[Backend Process] --> [Proc Array] : transaction visibility
+
+[WAL Writer] --> [WAL Buffers] : flush
+[WAL Writer] --> [WAL Files]
+
+[Checkpointer] --> [Shared Buffers] : checkpoint
+[Checkpointer] --> [Data Files]
+
+[Background Writer] --> [Shared Buffers]
+[Background Writer] --> [Data Files]
+
+[Autovacuum Launcher] --> [Autovacuum Worker]
+[Autovacuum Worker] --> [Data Files] : vacuum/analyze
+
+[Archiver] --> [WAL Files] : archive
+
+[Shared Buffers] --> [Data Files]
+
+@enduml

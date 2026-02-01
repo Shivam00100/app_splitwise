@@ -5,21 +5,23 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Data
 @Builder
 public class Transaction {
     @JsonProperty("transactionId")
-    private String transactionId;
+    private UUID transactionId;
 
     @JsonProperty("lender")
-    private String lender;
+    private UUID lender;
 
     @JsonProperty("borrower")
-    private String borrower;
+    private UUID borrower;
 
     @JsonProperty("amount")
     private Long amount;
 
     @JsonProperty("groupId")
-    private Long groupId;
+    private UUID groupId;
 }

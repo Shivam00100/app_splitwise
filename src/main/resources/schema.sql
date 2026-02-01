@@ -1,34 +1,34 @@
-CREATE TABLE IF NOT EXISTS users (
-    user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_name VARCHAR(100) NOT NULL
-) ENGINE=InnoDB;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS user_groups (
-    group_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    group_name VARCHAR(100) NOT NULL,
-    user_id BIGINT NOT NULL,
-    CONSTRAINT fk_group_owner
-        FOREIGN KEY (user_id) REFERENCES users(user_id)
-) ENGINE=InnoDB;
+-- Creating app Schema
+CREATE SCHEMA IF NOT EXISTS app_schema;
 
-CREATE TABLE IF NOT EXISTS group_transactions (
-    group_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    PRIMARY KEY (group_id, user_id),
-    CONSTRAINT fk_txn_group
-        FOREIGN KEY (group_id) REFERENCES user_groups(group_id),
-    CONSTRAINT fk_txn_user
-        FOREIGN KEY (user_id) REFERENCES users(user_id)
-) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS app_schema."user"(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_name VARCHAR(256) NOT NULL,
+    user_email VARCHAR(256) NOT NULL
+);
 
-CREATE TABLE IF NOT EXISTS friends (
-    user1 BIGINT NOT NULL,
-    user2 BIGINT NOT NULL,
-    PRIMARY KEY (user1, user2),
-    CONSTRAINT fk_friend_user1
-        FOREIGN KEY (user1) REFERENCES users(user_id),
-    CONSTRAINT fk_friend_user2
-        FOREIGN KEY (user2) REFERENCES users(user_id),
-    CONSTRAINT chk_no_self_friend
-        CHECK (user1 <> user2)
-) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS app_schema."groups"(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    group_name VARCHAR(256) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS app_schema."transaction"(
+   transaction_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+   borrower UUID NOT NULL,
+   lender UUID  NOT NULL,
+   amount BIGINT DEFAULT 0 NOT NULL,
+   group_id UUID NULL,
+   FOREIGN KEY (group_id) REFERENCES app_schema."groups"(id),
+   FOREIGN KEY (borrower) REFERENCES app_schema."user"(id),
+   FOREIGN KEY (lender) REFERENCES app_schema."user"(id)
+);
+
+CREATE TABLE IF NOT EXISTS app_schema."user_group"(
+    user_id UUID,
+    group_id UUID,
+    PRIMARY KEY (user_id, group_id),
+    FOREIGN KEY (user_id) REFERENCES app_schema."user"(id),
+    FOREIGN KEY (group_id) REFERENCES app_schema."groups"(id)
+);
