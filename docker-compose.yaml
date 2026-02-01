@@ -1,0 +1,20 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=app_user
+      - POSTGRES_PASSWORD=app_user123
+      - POSTGRES_DB=split_db
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    container_name: lets_split_app
+    ports:
+      - "8001:8001"
+    environment:
+      - "SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/split_db"
+    depends_on:
+      - database
